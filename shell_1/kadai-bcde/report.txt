@@ -1,0 +1,19 @@
+　05-211013　嶋村光太郎
+
+　man of termios、http://www.ncad.co.jp/~komata/c-kouza24.htm
+『例解UNIX/Linuxプログラミング教室 システムコールを使いこなすための12講』の記述を参考にした。
+　入力を1Byteずつ扱うためには、入力に関する端末モードを変更する必要があり、これはtermios構造体に
+含まれる入力に関する制御情報を変更すればよい。termios構造体の情報を変更するための方法は数多くあり、
+具体的に挙げるとioctlシステムコールの利用、tcgetattr,tcsettattrといったライブラリ関数の使用、sttyコマンドの
+利用等が存在する。このうち、ioctlの利用は低レベル、移植性に欠けるといった理由であまり使われていない。
+　今回はtermios関数群に含まれるtcgettattr,tcsettattr等のライブラリ関数を用いた実現方法を述べる。大まかな流れは
+まず、tcgettattrで現在のtermios構造体の情報を取得出来る。ここで取得したtermios構造体の情報を適切に設定し直した後に、
+tcsettattrで変更した情報を反映する。なお、tcgettattrで取得したtermios構造体の情報は別に保持しておいて
+最後にtcsettattrを再度行うことで端末の設定を元に戻すことが出来る。
+　次に具体的な設定方法について述べる。まず、tcflag_t c_lflagというローカルモードのフラグ情報に関して、ICANONを無効に
+することでカノニカルモードを無効に設定する。これによって、出力の行バッファリングが無効となり、続いてc_cc[VMIN]がカノニカル
+モードが無効な時の最小文字数を表しているため、これを1に設定する。こうすることで入力を1Byteずつ扱うことが出来る。
+　
+　また、BashにおいてTABでコマンドを補完する機能等はhttps://wiki.archlinux.jp/index.php/Readline
+を参照にすると、readlineというライブラリによって実現されている。readlineはコマンドラインの編集に利用される
+ライブラリであり、上方向キーによる履歴や、Ctrl Rによるreverse-search-history等もサポートしている。

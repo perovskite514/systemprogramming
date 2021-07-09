@@ -1,0 +1,2 @@
+kadai-fをmikeした後に実行して、その後にps -aを用いてプロセスIDを調べた後に
+kill プロセスIDをshellに打ち込むことでkadai-fを強制終了させることが出来た。
